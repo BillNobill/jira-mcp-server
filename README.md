@@ -12,8 +12,8 @@ This project bridges the gap between AI and your Jira workflow. Instead of manua
 ---
 
 ## 📋 Prerequisites
-- **Node.js** (v20.0.0 or higher recommended) - [Download here](https://nodejs.org/)
-- **Git** - [Download here](https://git-scm.com/)
+- **Node.js** (v20.0.0 or higher recommended)
+- **Git**
 - **Jira API Credentials**: [Get an API Token here](https://id.atlassian.com/manage-profile/security/api-tokens)
 
 ---
@@ -22,27 +22,22 @@ This project bridges the gap between AI and your Jira workflow. Instead of manua
 
 ### 1. Installation & Build
 ```powershell
-# Clone the repository (or copy the files)
 npm install
 npm run build
 ```
 
 ### 2. Configuration
-Create a `.env` file in the project root (use `.env.example` as a template):
+Create a `.env` file in the project root:
 ```env
 JIRA_EMAIL=your_email@example.com
 JIRA_API_TOKEN=your_api_token
 JIRA_BASE_URL=https://your-domain.atlassian.net
 ```
 
-### 3. Register with Gemini CLI (Global)
-To use this server anywhere on your computer, register it with the user scope:
+### 3. Register with Gemini CLI
 ```powershell
 gemini mcp add jira node "C:\FULL_PATH\TO\jira-mcp-server\dist\index.js" --scope user --trust
 ```
-
-> [!IMPORTANT]
-> Always use the **absolute path** to `dist/index.js` in the command above.
 
 ---
 
@@ -50,58 +45,56 @@ gemini mcp add jira node "C:\FULL_PATH\TO\jira-mcp-server\dist\index.js" --scope
 
 Your AI agent will automatically "learn" these advanced capabilities:
 
-### 📋 Project & Issue Management
+### 📋 Project & Issue Management (Full CRUD)
 - `list_projects`: List all accessible Jira projects.
 - `search_issues`: Find issues using JQL or text queries.
 - `get_issue`: Fetch full details of a specific Jira issue.
-- `create_issue`: Create new stories, tasks, or bugs.
-- `assign_issue`: Assign teammates to issues.
-- `add_comment`: Add comments to discuss issues.
+- `create_issue` / `update_issue`: Create or modify stories, tasks, or bugs.
+- `delete_issues`: Bulk Action to remove multiple issues and their subtasks.
+- `create_subtask`: Granular task breakdown for parent issues.
+- `link_issues` / `delete_issue_link`: Manage relationships between issues.
+- `get_all_labels`: List all labels used in the instance.
+- `add_attachment` / `delete_attachment`: Manage file attachments.
+
+### ⏱️ Time & Work Tracking
+- `add_worklog` / `update_worklog`: Log and modify hours worked on a task.
+- `delete_worklog`: Remove incorrect worklog entries.
 
 ### 🔄 Transitions & Workflow
 - `get_transitions`: See available status changes for an issue.
-- `transition_issue`: Move an issue through your workflow (e.g., "To Do" to "Done").
+- `transition_issue`: Move an issue through your workflow.
 
 ### 📊 Agile & Boards (Scrum/Kanban)
 - `get_boards`: List all Scrum and Kanban boards.
 - `get_sprints`: List sprints for a specific board.
 - `get_backlog`: Fetch issues in the backlog.
+- `create_sprint` / `update_sprint`: Manage sprint details and goals.
+- `update_sprint_state`: Start (`active`) or Close (`closed`) a sprint.
+- `delete_sprints`: Remove one or more sprints from a board.
 
-### 👥 User Management
+### 📦 Releases & Versions
+- `get_project_versions`: List all releases/versions for a project.
+- `create_version` / `update_version`: Manage the release lifecycle.
+- `delete_versions`: Remove project versions.
+
+### 🚀 Bulk Operations (Granular & Optimized)
+- `bulk_create_issues`: Create up to 50 issues in a single request.
+- `bulk_transition_issues`: Move multiple issues to a new status at once.
+- `delete_issues` / `delete_sprints`: Scalable deletion handling single or multiple IDs.
+
+### 👥 Professional Features
+- `assign_issue`: Assign teammates to tasks.
+- `add_comment` / `update_comment`: Manage discussion threads.
+- `delete_comment`: Remove irrelevant comments.
 - `find_users`: Search for users to get their account IDs.
 - `get_myself`: Get your own profile details.
 
 ---
 
 ## 🛠️ Troubleshooting
-
-> [!WARNING]
-> **Server shows as "Disconnected"?**
-> 1. **Empty Command:** If `/mcp list` shows a red dot, ensure your `settings.json` (at `C:\Users\YourUser\.gemini\settings.json`) has `"command": "node"` correctly set.
-> 2. **Environment Variables:** Run `node dist/index.js` manually. If it fails, check your `.env` or the environment variables in your client settings.
-> 3. **SDK Compatibility:** This project uses `@modelcontextprotocol/sdk` v1.29.0.
+1. **Disconnected?** Check if `settings.json` has `"command": "node"` and the correct path.
+2. **Permissions?** Ensure your API Token has permissions to read/write in the target projects.
 
 ---
 
-## 🐳 Docker Support
-
-> [!TIP]
-> Docker is perfect for keeping your local environment clean.
-
-```powershell
-# Build
-docker build -t jira-mcp-server .
-
-# Run
-docker run --rm -i --env-file .env jira-mcp-server
-```
-
----
-
-## 🤝 Contributing
-Contributions are welcome! If you find a bug or have a feature request, please open an issue or submit a pull request.
-
----
-
-**Created by [Luiz Feltrin]**  
-*Show some love! Give this repository a ⭐️ if it helped you!*
+**Created by [Luiz Feltrin]**

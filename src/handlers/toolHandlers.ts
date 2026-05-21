@@ -292,5 +292,451 @@ export function createToolHandlers(jira: JiraApi) {
         };
       }
     },
+
+    async handleAddWorklog(args: any) {
+      try {
+        const { issueKey, timeSpent, comment, started } = args;
+        const data: any = { timeSpent };
+        if (comment) {
+          data.comment = {
+            type: "doc",
+            version: 1,
+            content: [
+              {
+                type: "paragraph",
+                content: [{ type: "text", text: comment }],
+              },
+            ],
+          };
+        }
+        if (started) data.started = started;
+
+        const result = await jira.post(`/issue/${issueKey}/worklog`, data);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
+
+    async handleAddAttachment(args: any) {
+      try {
+        const { issueKey, filePath } = args;
+        const result = await jira.postAttachment(`/issue/${issueKey}/attachments`, filePath);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
+
+    async handleCreateSprint(args: any) {
+      try {
+        const { name, originBoardId, goal, startDate, endDate } = args;
+        const data: any = { name, originBoardId };
+        if (goal) data.goal = goal;
+        if (startDate) data.startDate = startDate;
+        if (endDate) data.endDate = endDate;
+
+        const result = await jira.post("/sprint", data, "agile/1.0");
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
+
+    async handleUpdateSprintState(args: any) {
+      try {
+        const { sprintId, state } = args;
+        const result = await jira.post(`/sprint/${sprintId}`, { state }, "agile/1.0");
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
+
+    async handleGetProjectVersions(args: any) {
+      try {
+        const { projectKey } = args;
+        const result = await jira.get(`/project/${projectKey}/versions`);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
+
+    async handleCreateVersion(args: any) {
+      try {
+        const { projectKey, name, description, releaseDate } = args;
+        const data: any = { project: projectKey, name };
+        if (description) data.description = description;
+        if (releaseDate) data.releaseDate = releaseDate;
+
+        const result = await jira.post("/version", data);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
+
+    async handleLinkIssues(args: any) {
+      try {
+        const { inwardIssueKey, outwardIssueKey, linkType } = args;
+        const data = {
+          type: { name: linkType },
+          inwardIssue: { key: inwardIssueKey },
+          outwardIssue: { key: outwardIssueKey },
+        };
+
+        await jira.post("/issueLink", data);
+        return {
+          content: [{ type: "text", text: `Issues ${inwardIssueKey} and ${outwardIssueKey} linked as '${linkType}'.` }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
+
+    async handleGetAllLabels() {
+      try {
+        const result = await jira.get("/label");
+        return {
+          content: [{ type: "text", text: JSON.stringify(result.values, null, 2) }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
+
+    async handleBulkCreateIssues(args: any) {
+      try {
+        const { issues } = args;
+        const data = {
+          issueUpdates: issues.map((issue: any) => ({
+            fields: {
+              project: { key: issue.projectKey },
+              summary: issue.summary,
+              description: issue.description ? {
+                type: "doc",
+                version: 1,
+                content: [
+                  {
+                    type: "paragraph",
+                    content: [{ type: "text", text: issue.description }],
+                  },
+                ],
+              } : undefined,
+              issuetype: { name: issue.issueType || "Task" },
+            },
+          })),
+        };
+
+        const result = await jira.post("/issue/bulk", data);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
+
+    async handleBulkTransitionIssues(args: any) {
+      try {
+        const { issueKeys, transitionId } = args;
+        const data = {
+          issueIdsOrKeys: issueKeys,
+          transition: { id: transitionId },
+        };
+
+        const result = await jira.post("/bulk/issues/transition", data);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
+
+    async handleCreateSubtask(args: any) {
+      try {
+        const { parentIssueKey, summary, description, issueType } = args;
+        const data: any = {
+          fields: {
+            project: { key: parentIssueKey.split("-")[0] },
+            parent: { key: parentIssueKey },
+            summary,
+            description: description ? {
+              type: "doc",
+              version: 1,
+              content: [{ type: "paragraph", content: [{ type: "text", text: description }] }],
+            } : undefined,
+            issuetype: { name: issueType || "Sub-task" },
+          },
+        };
+
+        const result = await jira.post("/issue", data);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
+
+    async handleUpdateIssue(args: any) {
+      try {
+        const { issueKey, fields } = args;
+        // In v3, description must be ADF. If user provides string, convert it.
+        if (fields.description && typeof fields.description === "string") {
+          fields.description = {
+            type: "doc",
+            version: 1,
+            content: [{ type: "paragraph", content: [{ type: "text", text: fields.description }] }],
+          };
+        }
+
+        await jira.put(`/issue/${issueKey}`, { fields });
+        return {
+          content: [{ type: "text", text: `Issue ${issueKey} updated successfully.` }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
+
+    async handleDeleteIssues(args: any) {
+      try {
+        const { issueKeys, deleteSubtasks } = args;
+        const results = await Promise.allSettled(
+          issueKeys.map((key: string) => 
+            jira.delete(`/issue/${key}${deleteSubtasks ? "?deleteSubtasks=true" : ""}`)
+          )
+        );
+        return {
+          content: [{ type: "text", text: JSON.stringify(results, null, 2) }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
+
+    async handleUpdateComment(args: any) {
+      try {
+        const { issueKey, commentId, comment } = args;
+        const data = {
+          body: {
+            type: "doc",
+            version: 1,
+            content: [{ type: "paragraph", content: [{ type: "text", text: comment }] }],
+          },
+        };
+        const result = await jira.put(`/issue/${issueKey}/comment/${commentId}`, data);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
+
+    async handleDeleteComment(args: any) {
+      try {
+        const { issueKey, commentId } = args;
+        await jira.delete(`/issue/${issueKey}/comment/${commentId}`);
+        return {
+          content: [{ type: "text", text: `Comment ${commentId} deleted from ${issueKey}.` }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
+
+    async handleUpdateWorklog(args: any) {
+      try {
+        const { issueKey, worklogId, timeSpent, comment } = args;
+        const data: any = {};
+        if (timeSpent) data.timeSpent = timeSpent;
+        if (comment) {
+          data.comment = {
+            type: "doc",
+            version: 1,
+            content: [{ type: "paragraph", content: [{ type: "text", text: comment }] }],
+          };
+        }
+        const result = await jira.put(`/issue/${issueKey}/worklog/${worklogId}`, data);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
+
+    async handleDeleteWorklog(args: any) {
+      try {
+        const { issueKey, worklogId } = args;
+        await jira.delete(`/issue/${issueKey}/worklog/${worklogId}`);
+        return {
+          content: [{ type: "text", text: `Worklog ${worklogId} deleted from ${issueKey}.` }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
+
+    async handleUpdateSprint(args: any) {
+      try {
+        const { sprintId, ...data } = args;
+        const result = await jira.put(`/sprint/${sprintId}`, data, "agile/1.0");
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
+
+    async handleDeleteSprints(args: any) {
+      try {
+        const { sprintIds } = args;
+        const results = await Promise.allSettled(
+          sprintIds.map((id: number) => jira.delete(`/sprint/${id}`, "agile/1.0"))
+        );
+        return {
+          content: [{ type: "text", text: JSON.stringify(results, null, 2) }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
+
+    async handleUpdateVersion(args: any) {
+      try {
+        const { versionId, ...data } = args;
+        const result = await jira.put(`/version/${versionId}`, data);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
+
+    async handleDeleteVersions(args: any) {
+      try {
+        const { versionIds } = args;
+        const results = await Promise.allSettled(
+          versionIds.map((id: string) => jira.delete(`/version/${id}`))
+        );
+        return {
+          content: [{ type: "text", text: JSON.stringify(results, null, 2) }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
+
+    async handleDeleteIssueLink(args: any) {
+      try {
+        const { linkId } = args;
+        await jira.delete(`/issueLink/${linkId}`);
+        return {
+          content: [{ type: "text", text: `Issue link ${linkId} deleted.` }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
+
+    async handleDeleteAttachment(args: any) {
+      try {
+        const { attachmentId } = args;
+        await jira.delete(`/attachment/${attachmentId}`);
+        return {
+          content: [{ type: "text", text: `Attachment ${attachmentId} deleted.` }],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Error: ${error}` }],
+          isError: true,
+        };
+      }
+    },
   };
 }

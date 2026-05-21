@@ -97,12 +97,22 @@ mcpServer.setRequestHandler(CallToolRequestSchema, async (request) => {
         return await toolHandlers.handleGetIssue(args);
       case "create_issue":
         return await toolHandlers.handleCreateIssue(args);
+      case "update_issue":
+        return await toolHandlers.handleUpdateIssue(args);
+      case "delete_issues":
+        return await toolHandlers.handleDeleteIssues(args);
+      case "create_subtask":
+        return await toolHandlers.handleCreateSubtask(args);
       case "get_transitions":
         return await toolHandlers.handleGetTransitions(args);
       case "transition_issue":
         return await toolHandlers.handleTransitionIssue(args);
       case "add_comment":
         return await toolHandlers.handleAddComment(args);
+      case "update_comment":
+        return await toolHandlers.handleUpdateComment(args);
+      case "delete_comment":
+        return await toolHandlers.handleDeleteComment(args);
       case "get_boards":
         return await toolHandlers.handleGetBoards();
       case "get_sprints":
@@ -115,6 +125,42 @@ mcpServer.setRequestHandler(CallToolRequestSchema, async (request) => {
         return await toolHandlers.handleFindUsers(args);
       case "get_myself":
         return await toolHandlers.handleGetMyself();
+      case "add_worklog":
+        return await toolHandlers.handleAddWorklog(args);
+      case "update_worklog":
+        return await toolHandlers.handleUpdateWorklog(args);
+      case "delete_worklog":
+        return await toolHandlers.handleDeleteWorklog(args);
+      case "add_attachment":
+        return await toolHandlers.handleAddAttachment(args);
+      case "delete_attachment":
+        return await toolHandlers.handleDeleteAttachment(args);
+      case "create_sprint":
+        return await toolHandlers.handleCreateSprint(args);
+      case "update_sprint":
+        return await toolHandlers.handleUpdateSprint(args);
+      case "update_sprint_state":
+        return await toolHandlers.handleUpdateSprintState(args);
+      case "delete_sprints":
+        return await toolHandlers.handleDeleteSprints(args);
+      case "get_project_versions":
+        return await toolHandlers.handleGetProjectVersions(args);
+      case "create_version":
+        return await toolHandlers.handleCreateVersion(args);
+      case "update_version":
+        return await toolHandlers.handleUpdateVersion(args);
+      case "delete_versions":
+        return await toolHandlers.handleDeleteVersions(args);
+      case "link_issues":
+        return await toolHandlers.handleLinkIssues(args);
+      case "delete_issue_link":
+        return await toolHandlers.handleDeleteIssueLink(args);
+      case "get_all_labels":
+        return await toolHandlers.handleGetAllLabels();
+      case "bulk_create_issues":
+        return await toolHandlers.handleBulkCreateIssues(args);
+      case "bulk_transition_issues":
+        return await toolHandlers.handleBulkTransitionIssues(args);
       default:
         throw new Error(`Tool "${name}" not found`);
     }
