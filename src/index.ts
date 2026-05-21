@@ -5,7 +5,7 @@ const start = async () => {
   try {
     const transport = new StdioServerTransport();
     await mcpServer.connect(transport);
-    console.error("Jira MCP Server connected and ready.");
+    console.error("Jira MCP Server connected and ready (Hardcoded Config).");
   } catch (error) {
     console.error("Failed to start Jira MCP server:", error);
     process.exit(1);

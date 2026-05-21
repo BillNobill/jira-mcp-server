@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from "axios";
+import { Buffer } from "node:buffer";
 
 export class JiraApi {
   private client: AxiosInstance;
@@ -6,13 +7,13 @@ export class JiraApi {
   constructor(email: string, token: string, baseUrl: string) {
     const auth = Buffer.from(`${email}:${token}`).toString("base64");
     this.client = axios.create({
+      baseURL: `${baseUrl}/rest`,
       headers: {
         Authorization: `Basic ${auth}`,
         "Content-Type": "application/json",
         Accept: "application/json",
       },
     });
-    this.client.defaults.baseURL = `${baseUrl}/rest`;
   }
 
   async get(path: string, params?: any, version: string = "api/3") {
@@ -39,7 +40,7 @@ export class JiraApi {
     const response = await fetch(url.toString(), {
       method: 'GET',
       headers: {
-        'Authorization': this.client.defaults.headers.common['Authorization'] as string,
+        'Authorization': this.client.defaults.headers.Authorization as string,
         'Accept': 'application/json',
       }
     });
