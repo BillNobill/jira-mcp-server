@@ -12,8 +12,8 @@ This project bridges the gap between AI and your Jira workflow. Instead of manua
 ---
 
 ## 📋 Prerequisites
-- **Node.js** (v20.0.0 or higher recommended)
-- **Git**
+- **Node.js** (v20.0.0 or higher recommended) - [Download here](https://nodejs.org/)
+- **Git** - [Download here](https://git-scm.com/)
 - **Jira API Credentials**: [Get an API Token here](https://id.atlassian.com/manage-profile/security/api-tokens)
 
 ---
@@ -22,22 +22,27 @@ This project bridges the gap between AI and your Jira workflow. Instead of manua
 
 ### 1. Installation & Build
 ```powershell
+# Clone the repository (or copy the files)
 npm install
 npm run build
 ```
 
 ### 2. Configuration
-Create a `.env` file in the project root:
+Create a `.env` file in the project root (use `.env.example` as a template):
 ```env
 JIRA_EMAIL=your_email@example.com
 JIRA_API_TOKEN=your_api_token
 JIRA_BASE_URL=https://your-domain.atlassian.net
 ```
 
-### 3. Register with Gemini CLI
+### 3. Register with Gemini CLI (Global)
+To use this server anywhere on your computer, register it with the user scope:
 ```powershell
 gemini mcp add jira node "C:\FULL_PATH\TO\jira-mcp-server\dist\index.js" --scope user --trust
 ```
+
+> [!IMPORTANT]
+> Always use the **absolute path** to `dist/index.js` in the command above.
 
 ---
 
@@ -92,9 +97,34 @@ Your AI agent will automatically "learn" these advanced capabilities:
 ---
 
 ## 🛠️ Troubleshooting
-1. **Disconnected?** Check if `settings.json` has `"command": "node"` and the correct path.
-2. **Permissions?** Ensure your API Token has permissions to read/write in the target projects.
+
+> [!WARNING]
+> **Server shows as "Disconnected"?**
+> 1. **Empty Command:** If `/mcp list` shows a red dot, ensure your `settings.json` (at `C:\Users\YourUser\.gemini\settings.json`) has `"command": "node"` correctly set.
+> 2. **Environment Variables:** Run `node dist/index.js` manually. If it fails, check your `.env` or the environment variables in your client settings.
+> 3. **SDK Compatibility:** This project uses `@modelcontextprotocol/sdk` v1.29.0.
 
 ---
 
-**Created by [Luiz Feltrin]**
+## 🐳 Docker Support
+
+> [!TIP]
+> Docker is perfect for keeping your local environment clean.
+
+```powershell
+# Build
+docker build -t jira-mcp-server .
+
+# Run
+docker run --rm -i --env-file .env jira-mcp-server
+```
+
+---
+
+## 🤝 Contributing
+Contributions are welcome! If you find a bug or have a feature request, please open an issue or submit a pull request.
+
+---
+
+**Created by [Luiz Feltrin]**  
+*Show some love! Give this repository a ⭐️ if it helped you!*
