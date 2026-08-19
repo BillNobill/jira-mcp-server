@@ -35,14 +35,54 @@ JIRA_API_TOKEN=your_api_token
 JIRA_BASE_URL=https://your-domain.atlassian.net
 ```
 
-### 3. Register with Gemini CLI (Global)
-To use this server anywhere on your computer, register it with the user scope:
+### 3. Register with your AI client
+
+#### Claude Code (Recommended)
 ```powershell
-gemini mcp add jira node "C:\FULL_PATH\TO\jira-mcp-server\dist\index.js" --scope user --trust
+claude mcp add --scope user jira node "C:\FULL_PATH\TO\jira-mcp-server\dist\index.js"
+```
+Env vars are read from the `.env` file or can be passed inline with `-e KEY=VALUE` flags.
+
+#### VS Code (GitHub Copilot / Claude extension)
+Add to your user `settings.json` (`Ctrl+Shift+P` → *Open User Settings JSON*):
+```json
+{
+  "mcp": {
+    "servers": {
+      "jira": {
+        "command": "node",
+        "args": ["C:\\FULL_PATH\\TO\\jira-mcp-server\\dist\\index.js"],
+        "env": {
+          "JIRA_EMAIL": "your_email@example.com",
+          "JIRA_API_TOKEN": "your_api_token",
+          "JIRA_BASE_URL": "https://your-domain.atlassian.net"
+        }
+      }
+    }
+  }
+}
+```
+
+#### Cursor
+Add to `%USERPROFILE%\.cursor\mcp.json`:
+```json
+{
+  "mcpServers": {
+    "jira": {
+      "command": "node",
+      "args": ["C:\\FULL_PATH\\TO\\jira-mcp-server\\dist\\index.js"],
+      "env": {
+        "JIRA_EMAIL": "your_email@example.com",
+        "JIRA_API_TOKEN": "your_api_token",
+        "JIRA_BASE_URL": "https://your-domain.atlassian.net"
+      }
+    }
+  }
+}
 ```
 
 > [!IMPORTANT]
-> Always use the **absolute path** to `dist/index.js` in the command above.
+> Always use the **absolute path** to `dist/index.js` in the configuration above.
 
 ---
 
@@ -100,9 +140,10 @@ Your AI agent will automatically "learn" these advanced capabilities:
 
 > [!WARNING]
 > **Server shows as "Disconnected"?**
-> 1. **Empty Command:** If `/mcp list` shows a red dot, ensure your `settings.json` (at `C:\Users\YourUser\.gemini\settings.json`) has `"command": "node"` correctly set.
-> 2. **Environment Variables:** Run `node dist/index.js` manually. If it fails, check your `.env` or the environment variables in your client settings.
+> 1. **Empty Command:** Check your client's MCP config and confirm `"command": "node"` and the absolute path to `dist/index.js` are correct.
+> 2. **Environment Variables:** Run `node dist/index.js` manually in the terminal. If it fails, check your `.env` or the environment variables in your client settings.
 > 3. **SDK Compatibility:** This project uses `@modelcontextprotocol/sdk` v1.29.0.
+> 4. **Claude Code:** Run `/mcp` inside a Claude Code session to see the server status and any error output.
 
 ---
 
